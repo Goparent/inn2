@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IA Aplicada — DIGION · Formación en Inteligencia Artificial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0a0a08;
+    --paper: #f2efe8;
+    --lime: #c8f135;
+    --amber: #f5a623;
+    --ghost: rgba(242,239,232,0.06);
+    --ghost2: rgba(242,239,232,0.12);
+    --ghost3: rgba(242,239,232,0.04);
+    --muted: rgba(242,239,232,0.45);
+    --border: rgba(242,239,232,0.1);
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 10px; height: 10px;
+    background: var(--lime);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.2s, height 0.2s, opacity 0.2s;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid var(--lime);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.18s ease-out, width 0.2s, height 0.2s, opacity 0.2s;
+    opacity: 0.5;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.35;
+  }
+
+  /* ═══════════ NAV ═══════════ */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 48px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,8,0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 28px;
+    letter-spacing: 0.06em;
+    color: var(--paper);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--lime); }
+
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--paper); }
+
+  .nav-cta {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    padding: 10px 22px;
+    border: 1px solid var(--lime);
+    color: var(--lime);
+    background: transparent;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+  }
+  .nav-cta:hover { background: var(--lime); color: var(--ink); }
+
+  /* ═══════════ HERO ═══════════ */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 48px 64px;
+    position: relative;
+    overflow: hidden;
+    padding-top: 100px;
+  }
+
+  .hero-grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(242,239,232,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(242,239,232,0.04) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
+
+  .hero-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--lime);
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .hero-headline {
+    font-family: var(--font-display);
+    font-size: clamp(80px, 12vw, 172px);
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    max-width: 1100px;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.35s forwards;
+  }
+
+  .hero-headline em {
+    font-style: normal;
+    color: var(--lime);
+    display: inline-block;
+    position: relative;
+  }
+
+  .hero-sub-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-top: 52px;
+    gap: 40px;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.55s forwards;
+  }
+
+  .hero-sub {
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--muted);
+    max-width: 520px;
+    line-height: 1.65;
+  }
+  .hero-sub strong { color: var(--paper); font-weight: 500; }
+
+  .hero-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .btn-primary {
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 0.05em;
+    padding: 16px 40px;
+    background: var(--lime);
+    color: var(--ink);
+    text-decoration: none;
+    transition: transform 0.15s, background 0.2s;
+    display: inline-block;
+  }
+  .btn-primary:hover { transform: translate(-2px, -2px); background: #d4ff3f; }
+
+  .btn-secondary {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 2px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .btn-secondary:hover { color: var(--paper); border-color: var(--paper); }
+
+  .hero-stats {
+    display: flex;
+    gap: 48px;
+    margin-top: 64px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    opacity: 0;
+    animation: fadeUp 0.9s 0.75s forwards;
+  }
+
+  .hero-stat-num {
+    font-family: var(--font-display);
+    font-size: 42px;
+    color: var(--paper);
+    line-height: 1;
+  }
+  .hero-stat-num span { color: var(--lime); }
+  .hero-stat-label {
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+
+  /* scroll indicator */
+  .scroll-hint {
+    position: absolute;
+    bottom: 28px;
+    right: 48px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 1s 1.1s forwards;
+  }
+  .scroll-line {
+    width: 40px; height: 1px;
+    background: var(--muted);
+    transform-origin: left;
+    animation: expandLine 1s 1.3s ease forwards;
+    transform: scaleX(0);
+  }
+
+  /* ═══════════ STRIP TICKER ═══════════ */
+  .ticker-wrap {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    white-space: nowrap;
+    background: var(--ghost3);
+    padding: 12px 0;
+  }
+  .ticker-track {
+    display: inline-flex;
+    gap: 0;
+    animation: ticker 28s linear infinite;
+  }
+  .ticker-item {
+    font-family: var(--font-display);
+    font-size: 15px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    padding: 0 40px;
+    text-transform: uppercase;
+  }
+  .ticker-item span { color: var(--lime); margin-right: 40px; }
+
+  /* ═══════════ SECTION BASE ═══════════ */
+  section { padding: 120px 48px; }
+
+  .label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--lime);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .label::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--lime);
+    display: inline-block;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(52px, 7vw, 96px);
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    margin-bottom: 48px;
+  }
+
+  /* ═══════════ PROBLEMA / TRANSFORMACIÓN ═══════════ */
+  .problem-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .before-after {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-top: 40px;
+  }
+
+  .ba-col {
+    padding: 28px 24px;
+    border: 1px solid var(--border);
+  }
+
+  .ba-col-head {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .ba-col.before .ba-col-head { color: var(--muted); }
+  .ba-col.after .ba-col-head { color: var(--lime); }
+  .ba-col.after { border-color: var(--lime); background: rgba(200,241,53,0.04); }
+
+  .ba-item {
+    font-size: 14px;
+    color: var(--muted);
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+  }
+  .ba-item:last-child { border-bottom: none; }
+  .ba-col.after .ba-item { color: var(--paper); }
+
+  .ba-icon { flex-shrink: 0; opacity: 0.5; }
+  .ba-col.after .ba-icon { opacity: 1; color: var(--lime); }
+
+  .problem-text {
+    padding-top: 16px;
+  }
+
+  .problem-stat {
+    font-family: var(--font-display);
+    font-size: 72px;
+    line-height: 1;
+    color: var(--lime);
+    margin: 40px 0 8px;
+  }
+  .problem-stat-label {
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 260px;
+    line-height: 1.5;
+  }
+
+  /* ═══════════ MÓDULOS ═══════════ */
+  .modules-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 64px;
+  }
+
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .module-card {
+    border: 1px solid var(--border);
+    padding: 40px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, background 0.3s;
+    cursor: default;
+  }
+  .module-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--lime);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .module-card:hover { border-color: rgba(200,241,53,0.3); background: var(--ghost); }
+  .module-card:hover::before { transform: scaleX(1); }
+
+  .module-num {
+    font-family: var(--font-display);
+    font-size: 100px;
+    line-height: 0.85;
+    color: var(--ghost2);
+    position: absolute;
+    top: 20px; right: 20px;
+    pointer-events: none;
+    transition: color 0.3s;
+  }
+  .module-card:hover .module-num { color: rgba(200,241,53,0.1); }
+
+  .module-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--lime);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .module-name {
+    font-family: var(--font-display);
+    font-size: 38px;
+    line-height: 1.0;
+    margin-bottom: 16px;
+    color: var(--paper);
+  }
+
+  .module-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  .module-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: auto;
+  }
+
+  .tool-pill {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 2px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .module-card:hover .tool-pill { border-color: rgba(200,241,53,0.3); color: var(--paper); }
+
+  .module-hours {
+    font-family: var(--font-display);
+    font-size: 48px;
+    color: var(--lime);
+    margin-top: 32px;
+    line-height: 1;
+  }
+  .module-hours-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* ═══════════ FORMATOS ═══════════ */
+  .formats-section { background: var(--ghost3); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+  .formats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+    margin-top: 64px;
+  }
+
+  .format-card {
+    padding: 40px 32px;
+    border: 1px solid var(--border);
+    position: relative;
+    transition: background 0.3s;
+  }
+  .format-card.featured {
+    border-color: var(--lime);
+    background: rgba(200,241,53,0.04);
+  }
+  .format-badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    padding: 4px 10px;
+    background: var(--lime);
+    color: var(--ink);
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+  .format-badge-ghost {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+
+  .format-name {
+    font-family: var(--font-display);
+    font-size: 32px;
+    margin-bottom: 8px;
+    color: var(--paper);
+  }
+
+  .format-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  .format-price {
+    font-family: var(--font-display);
+    font-size: 64px;
+    line-height: 1;
+    color: var(--paper);
+    margin-bottom: 4px;
+  }
+  .format-price-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  .format-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+  .format-feature {
+    font-size: 14px;
+    color: var(--muted);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .format-feature::before {
+    content: '→';
+    color: var(--lime);
+    flex-shrink: 0;
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  .btn-format {
+    display: block;
+    text-align: center;
+    padding: 14px 24px;
+    font-family: var(--font-display);
+    font-size: 18px;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-format-solid { background: var(--lime); color: var(--ink); }
+  .btn-format-solid:hover { background: #d4ff3f; transform: translateY(-1px); }
+  .btn-format-outline { border: 1px solid var(--border); color: var(--paper); }
+  .btn-format-outline:hover { border-color: var(--paper); }
+
+  .igic-note {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 24px;
+  }
+  .igic-note strong { color: var(--lime); }
+
+  /* ═══════════ TARGET ═══════════ */
+  .targets-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 64px;
+  }
+
+  .target-card {
+    padding: 32px 28px;
+    border: 1px solid var(--border);
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .target-card:hover { background: var(--ghost); border-color: rgba(200,241,53,0.2); }
+
+  .target-icon {
+    font-size: 28px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .target-name {
+    font-family: var(--font-display);
+    font-size: 26px;
+    margin-bottom: 8px;
+    color: var(--paper);
+  }
+
+  .target-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ═══════════ METODOLOGÍA ═══════════ */
+  .method-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 100px;
+    align-items: center;
+  }
+
+  .method-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .method-step {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 24px;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    transition: padding-left 0.3s;
+  }
+  .method-step:hover { padding-left: 8px; }
+
+  .step-num {
+    font-family: var(--font-display);
+    font-size: 52px;
+    line-height: 1;
+    color: var(--ghost2);
+    align-self: center;
+    transition: color 0.3s;
+  }
+  .method-step:hover .step-num { color: var(--lime); }
+
+  .step-content-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    color: var(--paper);
+    margin-bottom: 6px;
+  }
+  .step-content-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .method-visual {
+    position: relative;
+    height: 460px;
+  }
+
+  .method-box {
+    position: absolute;
+    border: 1px solid var(--border);
+    padding: 24px 28px;
+    background: var(--ghost3);
+  }
+
+  .method-box-1 { top: 0; left: 0; right: 80px; }
+  .method-box-2 { top: 120px; left: 60px; right: 0; border-color: rgba(200,241,53,0.3); background: rgba(200,241,53,0.04); }
+  .method-box-3 { bottom: 0; left: 20px; right: 40px; }
+
+  .method-box-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--lime);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .method-box-text {
+    font-size: 15px;
+    color: var(--paper);
+    font-weight: 300;
+  }
+
+  /* ═══════════ FUNDAE STRIP ═══════════ */
+  .fundae-strip {
+    background: rgba(200,241,53,0.08);
+    border: 1px solid rgba(200,241,53,0.25);
+    padding: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 48px;
+    margin: 0 48px;
+  }
+
+  .fundae-text {}
+  .fundae-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--lime);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .fundae-title {
+    font-family: var(--font-display);
+    font-size: 40px;
+    color: var(--paper);
+    line-height: 1;
+    max-width: 560px;
+  }
+  .fundae-sub {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 12px;
+    max-width: 480px;
+    line-height: 1.6;
+  }
+
+  .fundae-cta {
+    flex-shrink: 0;
+    font-family: var(--font-display);
+    font-size: 20px;
+    letter-spacing: 0.04em;
+    padding: 18px 36px;
+    background: var(--lime);
+    color: var(--ink);
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+    white-space: nowrap;
+  }
+  .fundae-cta:hover { background: #d4ff3f; transform: translate(-2px,-2px); }
+
+  /* ═══════════ ISLAS ═══════════ */
+  .islas-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    margin-top: 64px;
+  }
+
+  .isla-card {
+    padding: 28px 24px;
+    border: 1px solid var(--border);
+    transition: background 0.3s;
+  }
+  .isla-card:hover { background: var(--ghost); }
+
+  .isla-name {
+    font-family: var(--font-display);
+    font-size: 28px;
+    color: var(--paper);
+    margin-bottom: 6px;
+  }
+
+  .isla-sub {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    letter-spacing: 0.06em;
+  }
+
+  /* ═══════════ CTA FINAL ═══════════ */
+  .cta-section {
+    text-align: center;
+    padding: 160px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-bg-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: clamp(120px, 18vw, 280px);
+    color: rgba(242,239,232,0.025);
+    pointer-events: none;
+    white-space: nowrap;
+    letter-spacing: -0.02em;
+    user-select: none;
+  }
+
+  .cta-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--lime);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .cta-title {
+    font-family: var(--font-display);
+    font-size: clamp(60px, 9vw, 130px);
+    line-height: 0.92;
+    margin-bottom: 48px;
+    color: var(--paper);
+    position: relative;
+  }
+
+  .cta-title em {
+    font-style: normal;
+    color: var(--lime);
+  }
+
+  .cta-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+  }
+
+  .btn-big {
+    font-family: var(--font-display);
+    font-size: 24px;
+    letter-spacing: 0.04em;
+    padding: 20px 52px;
+    background: var(--lime);
+    color: var(--ink);
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-big:hover { background: #d4ff3f; transform: translate(-3px,-3px); }
+
+  .btn-ghost-big {
+    font-family: var(--font-display);
+    font-size: 24px;
+    letter-spacing: 0.04em;
+    padding: 20px 52px;
+    border: 1px solid var(--border);
+    color: var(--paper);
+    text-decoration: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .btn-ghost-big:hover { border-color: var(--paper); background: var(--ghost); }
+
+  /* ═══════════ FOOTER ═══════════ */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 24px;
+    letter-spacing: 0.06em;
+    color: var(--paper);
+  }
+  .footer-logo span { color: var(--lime); }
+
+  .footer-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+    flex-wrap: wrap;
+  }
+  .footer-links a {
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--paper); }
+
+  .footer-copy {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ═══════════ DIVIDERS ═══════════ */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 48px;
+  }
+
+  /* ═══════════ KEYFRAMES ═══════════ */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @keyframes expandLine {
+    to { transform: scaleX(1); }
+  }
+
+  /* ═══════════ SCROLL REVEAL ═══════════ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-d1 { transition-delay: 0.1s; }
+  .reveal-d2 { transition-delay: 0.2s; }
+  .reveal-d3 { transition-delay: 0.3s; }
+
+  /* ═══════════ MOBILE ═══════════ */
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    .hero { padding: 100px 24px 48px; }
+    section { padding: 80px 24px; }
+    .problem-section { grid-template-columns: 1fr; gap: 48px; }
+    .modules-grid { grid-template-columns: 1fr; }
+    .formats-grid { grid-template-columns: 1fr; }
+    .targets-grid { grid-template-columns: 1fr 1fr; }
+    .islas-grid { grid-template-columns: 1fr 1fr; }
+    .method-section { grid-template-columns: 1fr; gap: 48px; }
+    .method-visual { display: none; }
+    .hero-sub-row { flex-direction: column; align-items: flex-start; }
+    .hero-stats { gap: 28px; flex-wrap: wrap; }
+    .fundae-strip { flex-direction: column; margin: 0 24px; }
+    .cta-section { padding: 100px 24px; }
+    .divider { margin: 0 24px; }
+    footer { padding: 32px 24px; }
+    body { cursor: auto; }
+    .cursor, .cursor-ring { display: none; }
+    .modules-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">DIGION<span>·</span>IA</a>
+  <ul class="nav-links">
+    <li><a href="#modulos">Programa</a></li>
+    <li><a href="#formatos">Formatos</a></li>
+    <li><a href="#empresa">Empresa</a></li>
+    <li><a href="#islas">Canarias</a></li>
+  </ul>
+  <a href="#formatos" class="nav-cta">Reservar plaza</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-tag">Formación en IA Aplicada · Canarias 2025</div>
+  <h1 class="hero-headline">
+    Deja de<br>
+    <em>experimentar.</em><br>
+    Empieza a<br>construir.
+  </h1>
+
+  <div class="hero-sub-row">
+    <p class="hero-sub">
+      Un programa intensivo para profesionales, equipos y empresas que quieren pasar de usar ChatGPT<br>a <strong>construir soluciones reales con IA</strong>.
+    </p>
+    <div class="hero-actions">
+      <a href="#formatos" class="btn-primary">Ver programa →</a>
+      <a href="#empresa" class="btn-secondary">Soy empresa — formación a medida</a>
+    </div>
+  </div>
+
+  <div class="hero-stats">
+    <div>
+      <div class="hero-stat-num">3<span>×</span></div>
+      <div class="hero-stat-label">Módulos intensivos</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">24<span>h</span></div>
+      <div class="hero-stat-label">De aprendizaje real</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">0</div>
+      <div class="hero-stat-label">Conocimientos técnicos previos</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">100<span>%</span></div>
+      <div class="hero-stat-label">Bonificable via FUNDAE</div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <span class="ticker-item"><span>✦</span> ChatGPT · Claude · Gemini</span>
+    <span class="ticker-item"><span>✦</span> n8n · Automatización</span>
+    <span class="ticker-item"><span>✦</span> HeyGen · ElevenLabs · Suno</span>
+    <span class="ticker-item"><span>✦</span> Lovable · Vibecoding</span>
+    <span class="ticker-item"><span>✦</span> AI Agents · Workflows</span>
+    <span class="ticker-item"><span>✦</span> Prompting profesional</span>
+    <span class="ticker-item"><span>✦</span> RunwayML · Vídeo IA</span>
+    <span class="ticker-item"><span>✦</span> Bonificable FUNDAE</span>
+    <span class="ticker-item"><span>✦</span> ChatGPT · Claude · Gemini</span>
+    <span class="ticker-item"><span>✦</span> n8n · Automatización</span>
+    <span class="ticker-item"><span>✦</span> HeyGen · ElevenLabs · Suno</span>
+    <span class="ticker-item"><span>✦</span> Lovable · Vibecoding</span>
+    <span class="ticker-item"><span>✦</span> AI Agents · Workflows</span>
+    <span class="ticker-item"><span>✦</span> Prompting profesional</span>
+    <span class="ticker-item"><span>✦</span> RunwayML · Vídeo IA</span>
+    <span class="ticker-item"><span>✦</span> Bonificable FUNDAE</span>
+  </div>
+</div>
+
+<!-- PROBLEMA -->
+<section>
+  <div class="problem-section">
+    <div class="problem-text reveal">
+      <div class="label">El problema</div>
+      <h2 class="section-title">La brecha<br>de la IA</h2>
+      <p style="color: var(--muted); font-size: 16px; line-height: 1.75; max-width: 420px;">
+        Hay quienes usan IA para preguntar cosas. Y hay quienes usan IA para crear, automatizar y construir ventajas competitivas reales.
+        <br><br>
+        Este curso está diseñado para llevarte del primer grupo al segundo.
+      </p>
+
+      <div class="problem-stat">5%</div>
+      <div class="problem-stat-label">de empresas canarias usa IA de forma estratégica. La oportunidad está en el 95% restante.</div>
+    </div>
+
+    <div class="before-after reveal reveal-d2">
+      <div class="ba-col before">
+        <div class="ba-col-head">Antes del curso</div>
+        <div class="ba-item"><span class="ba-icon">✗</span> Usa ChatGPT de forma básica</div>
+        <div class="ba-item"><span class="ba-icon">✗</span> Obtiene resultados mediocres</div>
+        <div class="ba-item"><span class="ba-icon">✗</span> No sabe automatizar nada</div>
+        <div class="ba-item"><span class="ba-icon">✗</span> Ve el potencial pero no sabe cómo</div>
+        <div class="ba-item"><span class="ba-icon">✗</span> Depende de terceros para lo digital</div>
+      </div>
+      <div class="ba-col after">
+        <div class="ba-col-head">Después del curso</div>
+        <div class="ba-item"><span class="ba-icon">→</span> Diseña prompts profesionales</div>
+        <div class="ba-item"><span class="ba-icon">→</span> Crea contenido multimodal con IA</div>
+        <div class="ba-item"><span class="ba-icon">→</span> Automatiza tareas con n8n</div>
+        <div class="ba-item"><span class="ba-icon">→</span> Construye agentes y workflows</div>
+        <div class="ba-item"><span class="ba-icon">→</span> Desarrolla apps y webs con IA</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- MÓDULOS -->
+<section id="modulos">
+  <div class="modules-header reveal">
+    <div>
+      <div class="label">El programa</div>
+      <h2 class="section-title">3 módulos.<br>24 horas.<br>Un salto.</h2>
+    </div>
+    <p style="color: var(--muted); font-size: 15px; line-height: 1.7; max-width: 320px; text-align: right;">
+      Cada módulo construye sobre el anterior. Primero aprendes a pensar con IA. Luego a crear. Finalmente, a construir.
+    </p>
+  </div>
+
+  <div class="modules-grid">
+    <!-- M1 -->
+    <div class="module-card reveal">
+      <div class="module-num">01</div>
+      <div class="module-tag">Understand AI</div>
+      <h3 class="module-name">Fundamentos<br>+ Prompting</h3>
+      <p class="module-desc">
+        Cómo funcionan los modelos de IA. Qué es un LLM. Cómo comunicarse con la IA de forma estratégica. Diseño de prompts profesionales y reutilizables.
+      </p>
+      <div class="module-tools">
+        <span class="tool-pill">ChatGPT</span>
+        <span class="tool-pill">Claude</span>
+        <span class="tool-pill">Gemini</span>
+        <span class="tool-pill">NotebookLM</span>
+        <span class="tool-pill">Prompt Engineering</span>
+      </div>
+      <div class="module-hours">7–10<div class="module-hours-label">horas</div></div>
+    </div>
+
+    <!-- M2 -->
+    <div class="module-card reveal reveal-d1">
+      <div class="module-num">02</div>
+      <div class="module-tag">Create with AI</div>
+      <h3 class="module-name">Contenido<br>Personalizado</h3>
+      <p class="module-desc">
+        Buyer persona con IA. Estrategia de contenido aplicada. Creación de texto, imagen, audio y vídeo profesional. Producción multilingüe para tu negocio.
+      </p>
+      <div class="module-tools">
+        <span class="tool-pill">HeyGen</span>
+        <span class="tool-pill">ElevenLabs</span>
+        <span class="tool-pill">RunwayML</span>
+        <span class="tool-pill">Suno</span>
+        <span class="tool-pill">DALL·E</span>
+        <span class="tool-pill">Midjourney</span>
+      </div>
+      <div class="module-hours">7–10<div class="module-hours-label">horas</div></div>
+    </div>
+
+    <!-- M3 -->
+    <div class="module-card reveal reveal-d2">
+      <div class="module-num">03</div>
+      <div class="module-tag">Build with AI</div>
+      <h3 class="module-name">Nocode +<br>Agentes</h3>
+      <p class="module-desc">
+        Automatización de procesos con n8n. Diseño y despliegue de agentes de IA. Vibecoding con Lovable: crea apps y webs sin programar.
+      </p>
+      <div class="module-tools">
+        <span class="tool-pill">n8n</span>
+        <span class="tool-pill">Lovable</span>
+        <span class="tool-pill">AI Studio</span>
+        <span class="tool-pill">Make</span>
+        <span class="tool-pill">Claude API</span>
+      </div>
+      <div class="module-hours">7–10<div class="module-hours-label">horas</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- METODOLOGÍA -->
+<section>
+  <div class="method-section">
+    <div class="reveal">
+      <div class="label">Metodología</div>
+      <h2 class="section-title">Aprender<br>haciendo.</h2>
+
+      <div class="method-steps">
+        <div class="method-step">
+          <div class="step-num">01</div>
+          <div>
+            <div class="step-content-title">Learning by Doing</div>
+            <div class="step-content-desc">Trabajas con herramientas reales desde el primer minuto. Sin teoría vacía.</div>
+          </div>
+        </div>
+        <div class="method-step">
+          <div class="step-num">02</div>
+          <div>
+            <div class="step-content-title">Design Thinking aplicado</div>
+            <div class="step-content-desc">Idear, prototipar, experimentar y construir. Con IA como copiloto en cada fase.</div>
+          </div>
+        </div>
+        <div class="method-step">
+          <div class="step-num">03</div>
+          <div>
+            <div class="step-content-title">Casos reales</div>
+            <div class="step-content-desc">Los ejercicios usan situaciones de tu sector. Lo que construyes, te lo llevas.</div>
+          </div>
+        </div>
+        <div class="method-step">
+          <div class="step-num">04</div>
+          <div>
+            <div class="step-content-title">Sin requisitos técnicos</div>
+            <div class="step-content-desc">Diseñado para profesionales sin perfil tecnológico. Lo importante es tu criterio, no el código.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="method-visual reveal reveal-d2">
+      <div class="method-box method-box-1">
+        <div class="method-box-label">Resultado final</div>
+        <div class="method-box-text">Saldrás con prompts, workflows y una metodología clara para usar IA en tu trabajo desde el día siguiente.</div>
+      </div>
+      <div class="method-box method-box-2">
+        <div class="method-box-label">No es un curso de herramientas</div>
+        <div class="method-box-text">Es un programa para desarrollar la capacidad de trabajar con cualquier tecnología de IA, ahora y en el futuro.</div>
+      </div>
+      <div class="method-box method-box-3">
+        <div class="method-box-label">Lo que te llevas</div>
+        <div class="method-box-text">Prompts reutilizables · Workflows automatizados · Prototipos funcionales · Red profesional canaria</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TARGET -->
+<section>
+  <div class="reveal">
+    <div class="label">¿Para quién?</div>
+    <h2 class="section-title">Tu perfil.</h2>
+  </div>
+
+  <div class="targets-grid">
+    <div class="target-card reveal">
+      <span class="target-icon">◈</span>
+      <div class="target-name">Profesionales</div>
+      <p class="target-desc">Quieres ganar tiempo, mejorar resultados y destacar en tu sector integrando IA en tu trabajo diario.</p>
+    </div>
+    <div class="target-card reveal reveal-d1">
+      <span class="target-icon">◈</span>
+      <div class="target-name">Marketers</div>
+      <p class="target-desc">Necesitas crear contenido más rápido, en más formatos y para audiencias internacionales sin coste de producción.</p>
+    </div>
+    <div class="target-card reveal reveal-d2">
+      <span class="target-icon">◈</span>
+      <div class="target-name">Creativos</div>
+      <p class="target-desc">Quieres amplificar tu capacidad creativa con herramientas de imagen, audio y vídeo generativo de primer nivel.</p>
+    </div>
+    <div class="target-card reveal">
+      <span class="target-icon">◈</span>
+      <div class="target-name">Emprendedores</div>
+      <p class="target-desc">Quieres lanzar más rápido. Construir sin necesitar un equipo técnico. Automatizar lo operativo para centrarte en lo estratégico.</p>
+    </div>
+    <div class="target-card reveal reveal-d1">
+      <span class="target-icon">◈</span>
+      <div class="target-name">Empresas</div>
+      <p class="target-desc">Formación in-company para equipos completos. Casos de uso adaptados a tu sector. Bonificable al 100% con FUNDAE.</p>
+    </div>
+    <div class="target-card reveal reveal-d2">
+      <span class="target-icon">◈</span>
+      <div class="target-name">Consultores</div>
+      <p class="target-desc">Amplía tus servicios. Ofrece a tus clientes soluciones de IA aplicada. Multiplica tu valor diferencial como profesional.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FUNDAE STRIP -->
+<div class="fundae-strip reveal">
+  <div class="fundae-text">
+    <div class="fundae-eyebrow">Para empresas · FUNDAE</div>
+    <div class="fundae-title">Tu empresa puede formarse sin coste.</div>
+    <p class="fundae-sub">Si eres empresa, este programa es bonificable al 100% a través de FUNDAE. Nos encargamos de toda la gestión. Tu equipo se forma, tú recuperas la inversión en cuotas de Seguridad Social.</p>
+  </div>
+  <a href="#empresa" class="fundae-cta">Solicitar información →</a>
+</div>
+
+<div style="height: 80px;"></div>
+<div class="divider"></div>
+
+<!-- FORMATOS -->
+<section id="formatos" class="formats-section">
+  <div class="reveal">
+    <div class="label">Precios y formatos</div>
+    <h2 class="section-title">Elige tu<br>programa.</h2>
+  </div>
+
+  <div class="formats-grid">
+
+    <!-- Individual -->
+    <div class="format-card reveal">
+      <div class="format-badge-ghost">Individual</div>
+      <div class="format-name">Profesional</div>
+      <p class="format-sub">2 fines de semana intensivos. Viernes tarde + sábado. Sin conflicto con tu jornada laboral.</p>
+      <div class="format-price">449<span style="font-size:28px; color: var(--muted);">€</span></div>
+      <div class="format-price-label">IGIC 7% incluido · Early bird desde 299€</div>
+      <ul class="format-features">
+        <li class="format-feature">Acceso a los 3 módulos completos</li>
+        <li class="format-feature">Materiales y prompts reutilizables</li>
+        <li class="format-feature">Comunidad de alumni canaria</li>
+        <li class="format-feature">Certificado de finalización</li>
+        <li class="format-feature">Sesión de seguimiento post-curso</li>
+      </ul>
+      <a href="#contacto" class="btn-format btn-format-outline">Reservar plaza</a>
+    </div>
+
+    <!-- Recomendado -->
+    <div class="format-card featured reveal reveal-d1">
+      <div class="format-badge">⭐ Recomendado</div>
+      <div class="format-name">Empresa</div>
+      <p class="format-sub">Pack para 3 o más personas del mismo equipo. Descuento de grupo y bonificable con FUNDAE.</p>
+      <div class="format-price">349<span style="font-size:28px; color: var(--muted);">€/p</span></div>
+      <div class="format-price-label">Por persona · mín. 3 plazas · Bonificable FUNDAE</div>
+      <ul class="format-features">
+        <li class="format-feature">Todo lo del plan individual</li>
+        <li class="format-feature">Descuento de grupo aplicado</li>
+        <li class="format-feature">Gestión FUNDAE incluida</li>
+        <li class="format-feature">Casos de uso de tu sector</li>
+        <li class="format-feature">Seguimiento mensual de 60 días</li>
+      </ul>
+      <a href="#contacto" class="btn-format btn-format-solid">Solicitar propuesta</a>
+    </div>
+
+    <!-- Enterprise -->
+    <div class="format-card reveal reveal-d2" id="empresa">
+      <div class="format-badge-ghost">Enterprise</div>
+      <div class="format-name">In-Company</div>
+      <p class="format-sub">El programa viaja a tu empresa. 3 días intensivos en tus instalaciones. Adaptado a tu sector y procesos.</p>
+      <div class="format-price" style="font-size: 42px;">A medida</div>
+      <div class="format-price-label">Desde 3.500€ · Grupos de 8–15 personas</div>
+      <ul class="format-features">
+        <li class="format-feature">Diagnóstico previo de necesidades</li>
+        <li class="format-feature">Casos de uso de tu industria</li>
+        <li class="format-feature">100% bonificable con FUNDAE</li>
+        <li class="format-feature">Acompañamiento en implementación</li>
+        <li class="format-feature">Turismo · Marketing · Tech · Retail</li>
+      </ul>
+      <a href="#contacto" class="btn-format btn-format-outline">Hablar con el equipo</a>
+    </div>
+
+  </div>
+
+  <p class="igic-note" style="margin-top: 16px;">
+    Canarias aplica <strong>IGIC 7%</strong> (vs. IVA 21% en península) — pagas hasta un 14% menos de impuestos que en Madrid o Barcelona.
+  </p>
+</section>
+
+<div class="divider"></div>
+
+<!-- ISLAS -->
+<section id="islas">
+  <div class="reveal">
+    <div class="label">Disponible en Canarias</div>
+    <h2 class="section-title">Tu isla,<br>tu formación.</h2>
+    <p style="color: var(--muted); font-size: 16px; line-height: 1.7; max-width: 520px; margin-top: -16px;">
+      El programa arranca en Gran Canaria y Tenerife, y se expande progresivamente a todas las islas. ¿Tu isla no aparece? Anótate y te avisamos.
+    </p>
+  </div>
+
+  <div class="islas-grid">
+    <div class="isla-card reveal" style="border-color: rgba(200,241,53,0.4);">
+      <div class="isla-name">Gran Canaria</div>
+      <div class="isla-sub" style="color: var(--lime);">Disponible · Las Palmas</div>
+    </div>
+    <div class="isla-card reveal reveal-d1" style="border-color: rgba(200,241,53,0.4);">
+      <div class="isla-name">Tenerife</div>
+      <div class="isla-sub" style="color: var(--lime);">Disponible · Santa Cruz</div>
+    </div>
+    <div class="isla-card reveal reveal-d2">
+      <div class="isla-name">Lanzarote</div>
+      <div class="isla-sub">Próximamente</div>
+    </div>
+    <div class="isla-card reveal reveal-d3">
+      <div class="isla-name">Fuerteventura</div>
+      <div class="isla-sub">Próximamente</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CTA FINAL -->
+<section class="cta-section" id="contacto">
+  <div class="cta-bg-text">CONSTRUYE</div>
+  <div class="cta-label">¿Listo?</div>
+  <h2 class="cta-title">
+    El momento<br>es <em>ahora.</em>
+  </h2>
+  <p style="color: var(--muted); font-size: 16px; margin-bottom: 48px; position: relative;">
+    Plazas limitadas. Próxima edición en Gran Canaria.
+  </p>
+  <div class="cta-actions">
+    <a href="mailto:hola@digion.io?subject=Quiero%20reservar%20plaza%20-%20IA%20Aplicada" class="btn-big">Reservar mi plaza →</a>
+    <a href="mailto:hola@digion.io?subject=Información%20formación%20in-company" class="btn-ghost-big">Soy empresa</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">DIGION<span>·</span>IA</div>
+  <ul class="footer-links">
+    <li><a href="#modulos">Programa</a></li>
+    <li><a href="#formatos">Precios</a></li>
+    <li><a href="#empresa">Empresa</a></li>
+    <li><a href="mailto:hola@digion.io">Contacto</a></li>
+  </ul>
+  <div class="footer-copy">© 2025 DIGION · Formación en IA Aplicada · Canarias</div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '18px';
+      cursor.style.height = '18px';
+      ring.style.width = '52px';
+      ring.style.height = '52px';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '10px';
+      cursor.style.height = '10px';
+      ring.style.width = '36px';
+      ring.style.height = '36px';
+    });
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  reveals.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
